@@ -4,10 +4,40 @@
       c1: '2_2'
       c1e: '10_20'
       c6: True
-  kernel: '4.15.0-159-generic'
+  kernel: '4.15.0-169-generic'
   grub:
       menuentry: '1>6'
       boot_options: ''
+- name: 'vanilla_disable_pstate'
+  config:
+      pstate: False
+      c1: '2_2'
+      c1e: '10_20'
+      c6: True
+  kernel: '4.15.0-169-generic'
+  grub:
+      menuentry: '1>6'
+      boot_options: 'intel_pstate=disable'
+- name: 'vanilla_disable_c6'
+  config:
+      pstate: False
+      c1: '2_2'
+      c1e: '10_20'
+      c6: False
+  kernel: '4.15.0-169-generic'
+  grub:      
+      menuentry: '1>0'
+      boot_options: 'intel_pstate=disable intel_idle.max_cstate=2'
+- name: 'vanilla_disable_c1e_c6'
+  config:
+      pstate: False
+      c1: '2_2'
+      c1e: False
+      c6: False
+  kernel: '4.15.0-169-generic'
+  grub:      
+      menuentry: '1>0'
+      boot_options: 'intel_pstate=disable intel_idle.max_cstate=1'
 - name: 'baseline'
   config:
       pstate: False
