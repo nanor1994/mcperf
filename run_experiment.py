@@ -216,6 +216,7 @@ def main(argv):
 ##         {'turbo': True, 'kernelconfig': 'quick_c1'},
 ##         {'turbo': False, 'kernelconfig': 'quick_c1_disable_c6'},
 ##         {'turbo': True, 'kernelconfig': 'quick_c1_disable_c6'},
+        
 ##         {'turbo': False, 'kernelconfig': 'quick_c1_c1e'},
 ##         {'turbo': True, 'kernelconfig': 'quick_c1_c1e'},
 ##         {'turbo': True, 'kernelconfig': 'disable_cstates'},
@@ -230,7 +231,8 @@ def main(argv):
         'mcperf_records': 1000000,
         'mcperf_iadist': 'fb_ia',
         'mcperf_keysize': 'fb_key',
-        'mcperf_valuesize': 'fb_value'
+        'mcperf_valuesize': 'fb_value',
+        'perf_counters': 11
     })
     logging.getLogger('').setLevel(logging.INFO)
     if len(argv) < 1:
