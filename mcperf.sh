@@ -26,6 +26,7 @@ build_mcperf () {
   fi
   git clone https://github.com/shaygalon/memcache-perf
   pushd memcache-perf
+  git checkout 0afbe9b
   make -j4
   popd
 }
