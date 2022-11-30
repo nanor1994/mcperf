@@ -155,7 +155,7 @@ def run_single_experiment(root_results_dir, name_prefix, conf, idx,it):
         .format(agents_parameter(), conf.mcperf_warmup_qps, conf.mcperf_warmup_time, conf.mcperf_records, conf.mcperf_iadist, conf.mcperf_keysize, conf.mcperf_valuesize))    
 
     # do the measured run
-    exec_command("./profiler.py -n node1 start -i {}").format(it)
+    exec_command("./profiler.py -n node1 start -i {}".format(it))
     stdout = exec_command(
         "./memcache-perf/mcperf -s node1 --noload -B -T 40 -Q 1000 -D 4 -C 4 "
         "{} -c 4 -q {} -t {} -r {} "
