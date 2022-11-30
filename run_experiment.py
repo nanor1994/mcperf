@@ -143,6 +143,7 @@ def run_single_experiment(root_results_dir, name_prefix, conf, idx,it):
     # prepare profiler, memcached, and mcperf agents
     
     run_remote(conf)
+    exit()
     run_profiler(conf)
     exec_command("./memcache-perf/mcperf -s node1 --loadonly -r {} "
         "--iadist={} --keysize={} --valuesize={}"
