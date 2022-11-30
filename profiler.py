@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 from xmlrpc.server import SimpleXMLRPCServer
 import xmlrpc.client
 import argparse
@@ -11,7 +9,9 @@ import socket
 import time
 import threading
 import subprocess
+from subprocess import call
 import re
+import math
 
 # TODO: ProfilerGroup has a tick thread that wakes up at the minimum sampling period and wakes up each profiler if it has to wake up
 # TODO: Use sampling period and sampling length
@@ -20,7 +20,7 @@ import re
 #     for (new, old) in zip(new_vector, old_vector):
 #         diff.append([x[0] - x[1] for x in zip(new, old)])
 #     return diff
- 
+
 class EventProfiling:
     def __init__(self, sampling_period = 0, sampling_length = 1):
         self.terminate_thread = threading.Condition()
@@ -44,13 +44,16 @@ class EventProfiling:
         logging.info("Profiling thread terminated")
 
     def start(self):
+
         self.clear()
         if self.sampling_period:
+
             self.is_active=True
             self.thread = threading.Thread(target=EventProfiling.profile_thread, args=(self,))
             self.thread.daemon = True
             self.thread.start()
         else:
+
             timestamp = str(int(time.time()))
             self.sample(timestamp)
 
@@ -67,21 +70,35 @@ class EventProfiling:
 
 
 class PerfEventProfiling(EventProfiling):
-    def __init__(self, sampling_period=1, sampling_length=1):
+    def __init__(self, sampling_period=1, sampling_length=1, iteration=1):
+        print(sampling_period)
         super().__init__(sampling_period, sampling_length)
         self.perf_path = self.find_perf_path()
-        logging.info('Perf found at {}'.format(self.perf_path)) 
-        self.events = self.get_perf_power_events()
+
+        logging.info('Perf found at {}'.format(self.perf_path))
+
+        self.events = PerfEventProfiling.get_microarchitectural_events()
+        self.perf_stats_events = PerfEventProfiling.get_perf_stat_events()
+
         self.timeseries = {}
-        for e in self.events:
+        self.iteration=iteration
+
+        for e in self.perf_stats_events:
             self.timeseries[e] = []
+
+        #get pid of memcached    
+        cmd = ['pgrep', 'memcached']
+        result = subprocess.run(cmd, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        out = result.stdout.decode('utf-8').splitlines() + result.stderr.decode('utf-8').splitlines()
+        self.pid=out[0]
+        print(str(self.pid))
 
     def find_perf_path(self):
         kernel_uname = os.popen('uname -a').read().strip()
         if '4.15.0-159-generic' in kernel_uname:
-            return '/usr/bin/perf'
+            return 'perf'
         else:
-            return '/mydata/linux-4.15.18/perf'
+            return 'perf'
 
     def get_perf_power_events(self):
         events = []
@@ -91,26 +108,79 @@ class PerfEventProfiling(EventProfiling):
             m = re.match("(power/energy-.*/)\s*\[Kernel PMU event]", l)
             if m:
                 events.append(m.group(1))
+
+    @staticmethod
+    def get_microarchitectural_events():
+        events = []
+
+        events.append("instructions:u")
+        events.append("cycles:u")
+        events.append("instructions:k")
+        events.append("cycles:k")
+        events.append("BR_MISP_RETIRED.ALL_BRANCHES")
+        events.append("L1-icache-load-misses")
+        events.append("L1-dcache-load-misses")
+        events.append("dTLB-load-misses")
+        events.append("iTLB-load-misses")
+        events.append("mem_load_retired.l2_miss")
+        events.append("mem_load_retired.l3_miss")
         return events
 
+    @staticmethod
+    def get_perf_stat_events():
+        ev=[]
+
+        ev.append("instructions:u")
+        ev.append("cycles:u")
+        ev.append("instructions:k")
+        ev.append("cycles:k")
+        ev.append("BR_MISP_RETIRED.ALL_BRANCHES")
+        ev.append("L1-icache-load-misses")
+        ev.append("L1-dcache-load-misses")
+        ev.append("dTLB-load-misses")
+        ev.append("iTLB-load-misses")
+        ev.append("mem_load_retired.l2_miss")
+        ev.append("mem_load_retired.l3_miss")
+        
+        
+        return ev
+
     def sample(self, timestamp):
-        events_str = ','.join(self.events)
-        cmd = ['sudo', self.perf_path, 'stat', '-a', '-e', events_str, 'sleep', str(self.sampling_length)]
+
+        iterations_cycle=math.ceil((len(self.events))/4.0)  #4 number of available perf counters provided by intel +1 in orer to run perf stat without events
+        event_index=self.iteration%iterations_cycle
+        event_index=event_index*4
+
+        if (event_index+4) >= len(self.events) :
+            events_str = ','.join(self.events[(event_index):])
+        else:
+            events_str = ','.join(self.events[(event_index):(event_index+4)])
+
+        if events_str=="":
+            cmd = ['sudo', self.perf_path, 'stat', '-a','sleep', str(self.sampling_length)]
+        else:
+            cmd = ['sudo', self.perf_path, 'stat', '-e', events_str, '-p', self.pid, 'sleep', str(self.sampling_length)]
+        # -p self.pid
         result = subprocess.run(cmd, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
         out = result.stdout.decode('utf-8').splitlines() + result.stderr.decode('utf-8').splitlines()
-        for e in self.events:
+        print(out)
+
+        for e in self.perf_stats_events:
+
             for l in out:
                 l = l.lstrip()
                 m = re.match("(.*)\s+.*\s+{}".format(e), l)
+
                 if m:
                     value = m.group(1)
                     self.timeseries[e].append((timestamp, str(float(value.replace(',', '')))))
-    
-    # FIXME: Currently, we add a dummy zero sample when we finish sampling. 
+
+
+    # FIXME: Currently, we add a dummy zero sample when we finish sampling.
     # This helps us to determine the sampling duration later when we analyze the stats
     # It would be nice to have a more clear solution
     def zerosample(self, timestamp):
-        for e in self.events:
+        for e in self.perf_stats_events:
             self.timeseries[e].append((timestamp, str(0.0)))
 
     def interrupt_sample(self):
@@ -118,38 +188,8 @@ class PerfEventProfiling(EventProfiling):
 
     def clear(self):
         self.timeseries = {}
-        for e in self.events:
+        for e in self.perf_stats_events:
             self.timeseries[e] = []
-
-    def report(self):
-        return self.timeseries
-
-class MpstatProfiling(EventProfiling):
-    def __init__(self, sampling_period=1, sampling_length=1):
-        super().__init__(sampling_period, sampling_length)
-        self.timeseries = {}
-        self.timeseries['cpu_util'] = []
-
-    def sample(self, timestamp):
-        cmd = ['mpstat', '1', '1']
-        result = subprocess.run(cmd, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-        lines = result.stdout.decode('utf-8').splitlines() + result.stderr.decode('utf-8').splitlines()
-        for l in lines:
-            if 'Average' in l:
-                idle_val = float(l.split()[-1])
-                util_val = str(100.00-idle_val)
-                self.timeseries['cpu_util'].append((timestamp, util_val))
-                return 
-
-    def interrupt_sample(self):
-        pass
-
-    def zerosample(self, timestamp):
-        pass
-
-    def clear(self):
-        self.timeseries = {}
-        self.timeseries['cpu_util'] = []
 
     def report(self):
         return self.timeseries
@@ -208,20 +248,66 @@ class StateProfiling(EventProfiling):
     def report(self):
         return self.timeseries
 
+class RaplCountersProfiling(EventProfiling):
+    raplcounters_path = '/sys/class/powercap/intel-rapl/'
+
+    def __init__(self, sampling_period=0):
+        super().__init__(sampling_period)
+        self.domain_names = {}
+        self.domain_names = RaplCountersProfiling.power_domain_names()
+        self.timeseries = {}
+
+    @staticmethod
+    def power_domain_names():
+        raplcounters_path = RaplCountersProfiling.raplcounters_path
+        if not os.path.exists(raplcounters_path):
+            return []
+        domain_names = {}
+
+        #Find all supported domains of the system
+        for root, subdirs, files in os.walk(raplcounters_path):
+            for subdir in subdirs:
+                if "intel-rapl" in subdir:
+                    domain_names[open("{}/{}/{}".format(root, subdir,'name'), "r").read().strip()]= os.path.join(root,subdir,'energy_uj')
+        return domain_names
+
+
+    def sample(self, timestamp):
+         for domain in self.domain_names:
+                value = open(self.domain_names[domain], "r").read().strip()
+                self.timeseries.setdefault(domain, []).append((timestamp, value))
+
+
+    def interrupt_sample(self):
+        pass
+
+    def zerosample(self, timestamp):
+        pass
+
+    def clear(self):
+        self.timeseries = {}
+
+    def report(self):
+        return self.timeseries
+
 class ProfilingService:
     def __init__(self, profilers):
         self.profilers = profilers
-        
+
     def start(self):
+
         for p in self.profilers:
-            p.start()        
+            print(p)
+            p.start()
 
     def stop(self):
         for p in self.profilers:
-            p.stop()        
+            p.stop()
+        time.sleep(5)
 
     def report(self):
         timeseries = {}
+        time.sleep(5)
         for p in self.profilers:
             t = p.report()
             timeseries = {**timeseries, **t}
@@ -230,11 +316,14 @@ class ProfilingService:
     def set(self, kv):
         print(kv)
 
-def server(port):
-    perf_event_profiling = PerfEventProfiling(sampling_period=30,sampling_length=30)
-    mpstat_profiling = MpstatProfiling()
+
+def server(port,perf_iteration):
+    perf_event_profiling = PerfEventProfiling(sampling_period=120,sampling_length=180,iteration=perf_iteration)
     state_profiling = StateProfiling(sampling_period=0)
-    profiling_service = ProfilingService([perf_event_profiling, mpstat_profiling, state_profiling])
+    rapl_profiling = RaplCountersProfiling(sampling_period=0)
+
+    profiling_service = ProfilingService([rapl_profiling, state_profiling, perf_event_profiling])
+
     hostname = socket.gethostname().split('.')[0]
     server = SimpleXMLRPCServer((hostname, port), allow_none=True)
     server.register_instance(profiling_service)
@@ -284,7 +373,7 @@ class ReportAction:
     @staticmethod
     def write_output(stats, directory):
         if not os.path.exists(directory):
-            os.makedirs(directory)        
+            os.makedirs(directory)
         for metric_name,timeseries in stats.items():
             metric_file_name = metric_name.replace('/', '-')
             metric_file_path = os.path.join(directory, metric_file_name)
@@ -303,7 +392,6 @@ class SetAction:
 
     @staticmethod
     def action(args):
-        print(args)
         with xmlrpc.client.ServerProxy("http://{}:{}/".format(args.hostname, args.port)) as proxy:
             proxy.set(args.rest)
 
@@ -324,6 +412,10 @@ def parse_args():
         "-v", "--verbose", dest='verbose', action='store_true',
         help="verbose")
 
+    parser.add_argument(
+        "-i", "--iteration", dest='perf_iteration', type=int, default=1,
+        help="perf iteration to choose the right performance counters")
+
     subparsers = parser.add_subparsers(dest='subparser_name', help='sub-command help')
     actions = [StartAction, StopAction, ReportAction, SetAction]
     for a in actions:
@@ -343,7 +435,7 @@ def parse_args():
         else:
             raise Exception('Attempt to run in client mode but no command is given')
     else:
-        server(args.port)
+        server(args.port,args.perf_iteration)
 
 def real_main():
     parse_args()
@@ -358,4 +450,4 @@ def main():
         sys.exit(1)
 
 if __name__ == '__main__':
-    main()
+	main()
