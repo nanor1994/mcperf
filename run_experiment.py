@@ -213,6 +213,7 @@ def run_multiple_experiments(root_results_dir, batch_name, system_conf, batch_co
         iters_cycle=math.ceil(float(batch_conf.perf_counters)/4.0)
         for it in range(iters_cycle*(iter),iters_cycle*(iter+1)):
             run_single_experiment(root_results_dir, name_prefix, instance_conf, iter,it)
+            time.sleep(30)
 
 
 
