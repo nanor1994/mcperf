@@ -116,7 +116,10 @@ def configure_memcached_node(conf):
             time.sleep(30)
             pass
         os.system('ssh -n {} "cd ~/mcperf; sudo python3 configure.py -v --turbo={} --kernelconfig={} -v"'.format(node, conf['turbo'], conf['kernelconfig']))
-
+        if conf['ht'] == False:
+        	os.system('ssh -n {} "echo "forceoff" | sudo tee /sys/devices/system/cpu/smt/control"'.format(node))
+        
+        
 def agents_list():
     config = configparser.ConfigParser(allow_no_value=True)
     config.read('hosts')
@@ -126,7 +129,7 @@ def agents_parameter():
     la = ["-a " + a for a in agents_list()]
     return ' '.join(la)
 
-def run_single_experiment(root_results_dir, name_prefix, conf, idx):
+def run_single_experiment(root_results_dir, name_prefix, conf, idx,it):
     name = name_prefix + conf.shortname()
     results_dir_name = "{}-{}".format(name, idx)
     results_dir_path = os.path.join(root_results_dir, results_dir_name)
@@ -151,14 +154,23 @@ def run_single_experiment(root_results_dir, name_prefix, conf, idx):
         .format(agents_parameter(), conf.mcperf_warmup_qps, conf.mcperf_warmup_time, conf.mcperf_records, conf.mcperf_iadist, conf.mcperf_keysize, conf.mcperf_valuesize))    
 
     # do the measured run
-    exec_command("./profiler.py -n node1 start")
+    exec_command("./profiler.py -n node1 start -i {}").format(it)
     stdout = exec_command(
         "./memcache-perf/mcperf -s node1 --noload -B -T 40 -Q 1000 -D 4 -C 4 "
         "{} -c 4 -q {} -t {} -r {} "
         "--iadist={} --keysize={} --valuesize={}"
         .format(agents_parameter(), conf.mcperf_qps, conf.mcperf_time, conf.mcperf_records, conf.mcperf_iadist, conf.mcperf_keysize, conf.mcperf_valuesize))
-    exec_command("./profiler.py -n node1 stop")
+    exec_command("./profiler.py -n node1 stop -i {}").format(it)
 
+    cmd=['/users/nkazar02/mcperf/scripts/memcached-proc-time.sh']
+    result = subprocess.run(cmd, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    out = result.stdout.decode('utf-8').splitlines()
+    memcachedstats_results_path_name = os.path.join(results_dir_path, 'memcachedstatsrun')
+    memcached_stats_file = open(memcachedstats_results_path_name, 'w');
+    for i in out:
+    	memcached_stats_file.write(str(i) + "\n")
+    memcached_stats_file.close()
+    
     # write statistics 
     exec_command("./profiler.py -n node1 report -d {}".format(memcached_results_dir_path))
     mcperf_results_path_name = os.path.join(results_dir_path, 'mcperf')
@@ -190,13 +202,17 @@ def run_multiple_experiments(root_results_dir, batch_name, system_conf, batch_co
     name_prefix = "turbo={}-kernelconfig={}-".format(system_conf['turbo'], system_conf['kernelconfig'])
     #request_qps = [10000, 50000, 100000, 200000, 300000, 400000, 500000, 1000000, 2000000]
     #request_qps = [10000, 50000, 100000, 200000, 300000, 400000, 500000, 600000, 700000, 800000]
-    request_qps = [10000, 50000, 100000, 200000, 300000, 400000, 500000]
+    #request_qps = [10000, 50000, 100000, 200000, 300000, 400000, 500000]
+    request_qps = [10000]
     root_results_dir = os.path.join(root_results_dir, batch_name)
     set_uncore_freq(system_conf, 2000)
     for qps in request_qps:
         instance_conf = copy.copy(batch_conf)
         instance_conf.set('mcperf_qps', qps)
-        run_single_experiment(root_results_dir, name_prefix, instance_conf, iter)
+        temp_iter=iter
+        iters_cycle=math.ceil(float(batch_conf.perf_counters)/4.0)
+        for it in range(iters_cycle*(iter),iters_cycle*(iter+1)):
+        run_single_experiment(root_results_dir, name_prefix, instance_conf, iter,it)
 
 
 
@@ -207,7 +223,7 @@ def main(argv):
 #         {'turbo': False, 'kernelconfig': 'baseline'},
 #         {'turbo': False, 'kernelconfig': 'disable_c6'},
 #         {'turbo': True, 'kernelconfig': 'baseline'},
-         {'turbo': False, 'kernelconfig': 'disable_cstates'},
+         {'turbo': False, 'kernelconfig': 'disable_cstates','ht':False},
 ##         {'turbo': False, 'kernelconfig': 'disable_c6'},
 #         {'turbo': True, 'kernelconfig': 'disable_c6'},
 #         {'turbo': False, 'kernelconfig': 'disable_c1e_c6'},
@@ -240,7 +256,7 @@ def main(argv):
     batch_name = argv[0]
     for iter in range(0, 3):
         for system_conf in system_confs:
-            run_multiple_experiments('/users/hvolos01/data', batch_name, system_conf, batch_conf, iter)
+            run_multiple_experiments('/users/nkazar02/data', batch_name, system_conf, batch_conf, iter)
 
 if __name__ == '__main__':
     main(sys.argv[1:])
