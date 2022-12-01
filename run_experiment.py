@@ -166,6 +166,9 @@ def run_single_experiment(root_results_dir, name_prefix, conf, idx,it):
         .format(agents_parameter(), conf.mcperf_qps, conf.mcperf_time, conf.mcperf_records, conf.mcperf_iadist, conf.mcperf_keysize, conf.mcperf_valuesize))
     exec_command("sudo python3 ./profiler.py -n node1 -i {} stop".format(it))
     exec_command("sudo python3 ./profiler.py -n node1 report -d {}".format(memcached_results_dir_path))
+    
+    exec_command("sudo chmod 777 {}".format(memcached_results_dir_path))
+    
     cmd=['/users/nkazar02/mcperf/scripts/memcached-proc-time.sh']
     result = subprocess.run(cmd, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
     out = result.stdout.decode('utf-8').splitlines()
