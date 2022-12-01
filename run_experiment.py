@@ -164,8 +164,8 @@ def run_single_experiment(root_results_dir, name_prefix, conf, idx,it):
         "{} -c 4 -q {} -t {} -r {} "
         "--iadist={} --keysize={} --valuesize={}"
         .format(agents_parameter(), conf.mcperf_qps, conf.mcperf_time, conf.mcperf_records, conf.mcperf_iadist, conf.mcperf_keysize, conf.mcperf_valuesize))
-    exec_command("./profiler.py -n node1 stop -i {}".format(it))
-
+    exec_command("./profiler.py -n node1 stop ")
+    exit()
     cmd=['/users/nkazar02/mcperf/scripts/memcached-proc-time.sh']
     result = subprocess.run(cmd, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
     out = result.stdout.decode('utf-8').splitlines()
