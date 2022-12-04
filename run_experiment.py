@@ -263,7 +263,7 @@ def main(argv):
 ##         {'turbo': True, 'kernelconfig': 'disable_cstates'},
     ]
     batch_conf = common.Configuration({
-        'memcached_worker_threads': 10,
+        'memcached_worker_threads': 20,
         'memcached_memory_limit_mb': 16384,
         'memcached_pin_threads': 'true',
         'mcperf_time': 120,
