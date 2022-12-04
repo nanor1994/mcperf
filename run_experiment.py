@@ -13,6 +13,14 @@ import common
 
 log = logging.getLogger(__name__)
 
+def run_profiler(conf,id):
+    extravars = [
+        'ITERATION={}'.format(id)]
+    run_ansible_playbook(
+        inventory='hosts', 
+        extravars=extravars,
+        playbook='ansible/profiler.yml', 
+        tags='run_profiler')
 
 def exec_command(cmd):
     logging.info(cmd)
