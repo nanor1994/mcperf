@@ -132,7 +132,7 @@ def agents_parameter():
     return ' '.join(la)
 
 def run_single_experiment(root_results_dir, name_prefix, conf, idx,it):
-    name = name_prefix + conf.shortname()+"SMT:"+str(conf['ht'])
+    name = name_prefix + conf.shortname()
     results_dir_name = "{}-{}".format(name, idx)
     results_dir_path = os.path.join(root_results_dir, results_dir_name)
     memcached_results_dir_path = os.path.join(results_dir_path, 'memcached')
@@ -202,7 +202,7 @@ def run_single_experiment(root_results_dir, name_prefix, conf, idx,it):
 
 def run_multiple_experiments_with_varying_freq(root_results_dir, batch_name, system_conf, batch_conf, iter):
     configure_memcached_node(system_conf)
-    name_prefix = "turbo={}-kernelconfig={}-".format(system_conf['turbo'], system_conf['kernelconfig'])
+    name_prefix = "turbo={}-kernelconfig={}-SMT={}".format(system_conf['turbo'], system_conf['kernelconfig'], system_conf['ht'])
     request_qps = [10000, 50000, 100000, 200000, 300000, 400000, 500000]
     root_results_dir = os.path.join(root_results_dir, batch_name)
     set_uncore_freq(system_conf, 1600)
@@ -216,7 +216,7 @@ def run_multiple_experiments_with_varying_freq(root_results_dir, batch_name, sys
 
 def run_multiple_experiments(root_results_dir, batch_name, system_conf, batch_conf, iter):
     configure_memcached_node(system_conf)
-    name_prefix = "turbo={}-kernelconfig={}-".format(system_conf['turbo'], system_conf['kernelconfig'])
+    name_prefix = "turbo={}-kernelconfig={}-SMT={}-".format(system_conf['turbo'], system_conf['kernelconfig'], system_conf['ht'])
     #request_qps = [10000, 50000, 100000, 200000, 300000, 400000, 500000, 1000000, 2000000]
     #request_qps = [10000, 50000, 100000, 200000, 300000, 400000, 500000, 600000, 700000, 800000]
     #request_qps = [10000, 50000, 100000, 200000, 300000, 400000, 500000]
