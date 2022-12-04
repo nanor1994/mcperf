@@ -160,7 +160,7 @@ def run_single_experiment(root_results_dir, name_prefix, conf, idx,it):
     cmd=['/users/nkazar02/mcperf/scripts/memcached-proc-time.sh']
     result = subprocess.run(cmd, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
     out = result.stdout.decode('utf-8').splitlines()
-    memcachedstats_results_path_name = os.path.join('./', 'memcachedstatsrun')
+    memcachedstats_results_path_name = os.path.join('./', 'memcachedstatsrun{}'.format(it))
     memcached_stats_file = open(memcachedstats_results_path_name, 'w');
     for i in out:
     	memcached_stats_file.write(str(i) + "\n")
@@ -190,7 +190,7 @@ def run_single_experiment(root_results_dir, name_prefix, conf, idx,it):
     
     # write statistics 
     
-    mcperf_results_path_name = os.path.join(results_dir_path, 'mcperf')
+    mcperf_results_path_name = os.path.join(results_dir_path, 'mcperf{}'.format(it))
     with open(mcperf_results_path_name, 'w') as fo:
         for l in stdout:
             fo.write(l+'\n')
@@ -279,7 +279,7 @@ def main(argv):
     if len(argv) < 1:
         raise Exception("Experiment name is missing")
     batch_name = argv[0]
-    for iter in range(0, 3):
+    for iter in range(0, 5):
         for system_conf in system_confs:
             run_multiple_experiments('/users/nkazar02/mcperf/data', batch_name, system_conf, batch_conf, iter)
 
