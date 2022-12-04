@@ -182,7 +182,7 @@ def run_single_experiment(root_results_dir, name_prefix, conf, idx,it):
     cmd=['/users/nkazar02/mcperf/scripts/memcached-proc-time.sh']
     result = subprocess.run(cmd, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
     out = result.stdout.decode('utf-8').splitlines()
-    memcachedstats_results_path_name = os.path.join(results_dir_path, 'memcachedstatsrun')
+    memcachedstats_results_path_name = os.path.join(results_dir_path, 'memcachedstatsrun{}'.format(it))
     memcached_stats_file = open(memcachedstats_results_path_name, 'w');
     for i in out:
     	memcached_stats_file.write(str(i) + "\n")
