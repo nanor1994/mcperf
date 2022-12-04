@@ -231,7 +231,8 @@ def run_multiple_experiments(root_results_dir, batch_name, system_conf, batch_co
         instance_conf.set('mcperf_qps', qps)
         temp_iter=iter
         iters_cycle=math.ceil(float(batch_conf.perf_counters)/4.0)
-        for it in range(iters_cycle*(iter),iters_cycle*(iter+1)):
+     #   for it in range(iters_cycle*(iter),iters_cycle*(iter+1)):
+        for it in range(3,9):
             run_single_experiment(root_results_dir, name_prefix, instance_conf,it)
             time.sleep(30)
 
@@ -244,10 +245,10 @@ def main(argv):
 #         {'turbo': False, 'kernelconfig': 'baseline'},
 #         {'turbo': False, 'kernelconfig': 'disable_c6'},
 #         {'turbo': True, 'kernelconfig': 'baseline'},
-         {'turbo': False, 'kernelconfig': 'disable_cstates','ht':False},
-         {'turbo': False, 'kernelconfig': 'disable_cstates','ht':True},
-   #      {'turbo': False, 'kernelconfig': 'baseline','ht':False},
-     #    {'turbo': False, 'kernelconfig': 'baseline','ht':True},
+   #      {'turbo': False, 'kernelconfig': 'disable_cstates','ht':False},
+    #     {'turbo': False, 'kernelconfig': 'disable_cstates','ht':True},
+         {'turbo': False, 'kernelconfig': 'baseline','ht':False},
+         {'turbo': False, 'kernelconfig': 'baseline','ht':True},
      #    {'turbo': False, 'kernelconfig': 'disable_c1e_c6','ht':False},
      #    {'turbo': False, 'kernelconfig': 'disable_c1e_c6','ht':True},
       #   {'turbo': False, 'kernelconfig': 'disable_c6','ht':False},
@@ -283,7 +284,7 @@ def main(argv):
     if len(argv) < 1:
         raise Exception("Experiment name is missing")
     batch_name = argv[0]
-    for iter in range(1, 3):
+    for iter in range(0, 1):
         for system_conf in system_confs:
             run_multiple_experiments('/users/nkazar02/mcperf/data', batch_name, system_conf, batch_conf, iter)
 
