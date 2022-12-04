@@ -5,7 +5,7 @@
   - run_profiler
   tasks:
   - name: Run remote profiler
-    command: sudo python3 ~/mcperf/profiler.py
+    command: sudo taskset -c 12 python3 ~/mcperf/profiler.py -i {{ ITERATION }}
     async: 10000 
     poll: 0
 - name: Kill remote profiler
