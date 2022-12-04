@@ -119,7 +119,8 @@ def configure_memcached_node(conf):
         os.system('ssh -n {} "cd ~/mcperf; sudo python3 configure.py -v --turbo={} --kernelconfig={} -v"'.format(node, conf['turbo'], conf['kernelconfig']))
         if conf['ht'] == False:
         	os.system('ssh -n {} "echo "forceoff" | sudo tee /sys/devices/system/cpu/smt/control"'.format(node))
-        
+        if conf['ht'] == True:
+        	os.system('ssh -n {} "echo "on" | sudo tee /sys/devices/system/cpu/smt/control"'.format(node))        
         
 def agents_list():
     config = configparser.ConfigParser(allow_no_value=True)
@@ -131,7 +132,7 @@ def agents_parameter():
     return ' '.join(la)
 
 def run_single_experiment(root_results_dir, name_prefix, conf, idx,it):
-    name = name_prefix + conf.shortname()
+    name = name_prefix + conf.shortname()+"SMT:"+conf['ht']
     results_dir_name = "{}-{}".format(name, idx)
     results_dir_path = os.path.join(root_results_dir, results_dir_name)
     memcached_results_dir_path = os.path.join(results_dir_path, 'memcached')
@@ -245,7 +246,7 @@ def main(argv):
          {'turbo': False, 'kernelconfig': 'disable_c1e_c6','ht':False},
          {'turbo': False, 'kernelconfig': 'quick_c1','ht':False},
          {'turbo': False, 'kernelconfig': 'disable_cstates','ht':True},
-         {'turbo': False, 'kernelconfig': 'baseline','ht':True},
+        {'turbo': False, 'kernelconfig': 'baseline','ht':True},
          {'turbo': False, 'kernelconfig': 'disable_c1e_c6','ht':True},
          {'turbo': False, 'kernelconfig': 'quick_c1','ht':True},
 ##         {'turbo': False, 'kernelconfig': 'disable_c6'},
