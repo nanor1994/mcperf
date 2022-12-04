@@ -156,12 +156,10 @@ def run_single_experiment(root_results_dir, name_prefix, conf, idx,it):
         "{} -c 4 -q {} -t {} -r {} " 
         "--iadist={} --keysize={} --valuesize={}"
         .format(agents_parameter(), conf.mcperf_warmup_qps, conf.mcperf_warmup_time, conf.mcperf_records, conf.mcperf_iadist, conf.mcperf_keysize, conf.mcperf_valuesize))    
-    exec_command("sudo mkdir {}".format(memcached_results_dir_path))
-    exec_command("sudo chmod 777 {}".format(memcached_results_dir_path))
     cmd=['/users/nkazar02/mcperf/scripts/memcached-proc-time.sh']
     result = subprocess.run(cmd, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
     out = result.stdout.decode('utf-8').splitlines()
-    memcachedstats_results_path_name = os.path.join(results_dir_path, 'memcachedstatsrun')
+    memcachedstats_results_path_name = os.path.join('./', 'memcachedstatsrun')
     memcached_stats_file = open(memcachedstats_results_path_name, 'w');
     for i in out:
     	memcached_stats_file.write(str(i) + "\n")
