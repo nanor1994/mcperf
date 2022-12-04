@@ -60,11 +60,6 @@ def set_core_freq(conf, freq_mhz):
        extravars=extravars, 
        playbook='ansible/configure_core_freq.yml')
 
-def run_profiler(conf):
-    run_ansible_playbook(
-        inventory='hosts', 
-        playbook='ansible/profiler.yml', 
-        tags='run_profiler')
 
 def kill_profiler(conf):
     run_ansible_playbook(
@@ -152,7 +147,7 @@ def run_single_experiment(root_results_dir, name_prefix, conf, idx,it):
     # prepare profiler, memcached, and mcperf agents
     
     run_remote(conf)
-    run_profiler(conf)
+    run_profiler(conf,it)
     
 
     exec_command("./memcache-perf/mcperf -s node1 --loadonly -r {} "
