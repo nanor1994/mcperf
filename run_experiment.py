@@ -134,7 +134,7 @@ def agents_parameter():
     la = ["-a " + a for a in agents_list()]
     return ' '.join(la)
 
-def run_single_experiment(root_results_dir, name_prefix, conf, idx,it):
+def run_single_experiment(root_results_dir, name_prefix, conf, idx):
     name = name_prefix + conf.shortname()
     results_dir_name = "{}-{}".format(name, idx)
     results_dir_path = os.path.join(root_results_dir, results_dir_name)
@@ -147,7 +147,7 @@ def run_single_experiment(root_results_dir, name_prefix, conf, idx,it):
     # prepare profiler, memcached, and mcperf agents
     
     run_remote(conf)
-    run_profiler(conf,it)
+    run_profiler(conf,idx)
     
 
     exec_command("./memcache-perf/mcperf -s node1 --loadonly -r {} "
@@ -163,7 +163,7 @@ def run_single_experiment(root_results_dir, name_prefix, conf, idx,it):
     cmd=['/users/nkazar02/mcperf/scripts/memcached-proc-time.sh']
     result = subprocess.run(cmd, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
     out = result.stdout.decode('utf-8').splitlines()
-    memcachedstats_results_path_name = os.path.join('./', 'memcachedstatsrun{}'.format(it))
+    memcachedstats_results_path_name = os.path.join('./', 'memcachedstatsrun{}'.format(idx))
     memcached_stats_file = open(memcachedstats_results_path_name, 'w');
     for i in out:
     	memcached_stats_file.write(str(i) + "\n")
@@ -171,13 +171,13 @@ def run_single_experiment(root_results_dir, name_prefix, conf, idx,it):
     
     
     # do the measured run
-    exec_command("sudo python3 ./profiler.py -n node1 -i {} start".format(it))
+    exec_command("sudo python3 ./profiler.py -n node1 -i {} start".format(idx))
     stdout = exec_command(
         "./memcache-perf/mcperf -s node1 --noload -B -T 40 -Q 1000 -D 4 -C 4 "
         "{} -c 4 -q {} -t {} -r {} "
         "--iadist={} --keysize={} --valuesize={}"
         .format(agents_parameter(), conf.mcperf_qps, conf.mcperf_time, conf.mcperf_records, conf.mcperf_iadist, conf.mcperf_keysize, conf.mcperf_valuesize))
-    exec_command("sudo python3 ./profiler.py -n node1 -i {} stop".format(it))
+    exec_command("sudo python3 ./profiler.py -n node1 -i {} stop".format(idx))
     exec_command("sudo python3 ./profiler.py -n node1 report -d {}".format(memcached_results_dir_path))
     
     exec_command("sudo chmod 777 {}".format(memcached_results_dir_path))
@@ -185,7 +185,7 @@ def run_single_experiment(root_results_dir, name_prefix, conf, idx,it):
     cmd=['/users/nkazar02/mcperf/scripts/memcached-proc-time.sh']
     result = subprocess.run(cmd, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
     out = result.stdout.decode('utf-8').splitlines()
-    memcachedstats_results_path_name = os.path.join(results_dir_path, 'memcachedstatsrun{}'.format(it))
+    memcachedstats_results_path_name = os.path.join(results_dir_path, 'memcachedstatsrun{}'.format(idx))
     memcached_stats_file = open(memcachedstats_results_path_name, 'w');
     for i in out:
     	memcached_stats_file.write(str(i) + "\n")
@@ -193,7 +193,7 @@ def run_single_experiment(root_results_dir, name_prefix, conf, idx,it):
     
     # write statistics 
     
-    mcperf_results_path_name = os.path.join(results_dir_path, 'mcperf{}'.format(it))
+    mcperf_results_path_name = os.path.join(results_dir_path, 'mcperf{}'.format(idx))
     with open(mcperf_results_path_name, 'w') as fo:
         for l in stdout:
             fo.write(l+'\n')
@@ -232,7 +232,7 @@ def run_multiple_experiments(root_results_dir, batch_name, system_conf, batch_co
         temp_iter=iter
         iters_cycle=math.ceil(float(batch_conf.perf_counters)/4.0)
         for it in range(iters_cycle*(iter),iters_cycle*(iter+1)):
-            run_single_experiment(root_results_dir, name_prefix, instance_conf,iter,it)
+            run_single_experiment(root_results_dir, name_prefix, instance_conf,it)
             time.sleep(30)
 
 
