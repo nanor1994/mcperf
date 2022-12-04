@@ -132,7 +132,7 @@ def agents_parameter():
     return ' '.join(la)
 
 def run_single_experiment(root_results_dir, name_prefix, conf, idx,it):
-    name = name_prefix + conf.shortname()+"SMT:"+conf['ht']
+    name = name_prefix + conf.shortname()+"SMT:"+str(conf['ht'])
     results_dir_name = "{}-{}".format(name, idx)
     results_dir_path = os.path.join(root_results_dir, results_dir_name)
     memcached_results_dir_path = os.path.join(results_dir_path, 'memcached')
