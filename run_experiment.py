@@ -283,7 +283,7 @@ def main(argv):
     if len(argv) < 1:
         raise Exception("Experiment name is missing")
     batch_name = argv[0]
-    for iter in range(0, 5):
+    for iter in range(1, 5):
         for system_conf in system_confs:
             run_multiple_experiments('/users/nkazar02/mcperf/data', batch_name, system_conf, batch_conf, iter)
 
