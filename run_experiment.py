@@ -232,7 +232,7 @@ def run_multiple_experiments(root_results_dir, batch_name, system_conf, batch_co
         temp_iter=iter
         iters_cycle=math.ceil(float(batch_conf.perf_counters)/4.0)
      #   for it in range(iters_cycle*(iter),iters_cycle*(iter+1)):
-        for it in range(5,9):
+        for it in range(0,9):
             run_single_experiment(root_results_dir, name_prefix, instance_conf,it)
             time.sleep(30)
 
@@ -250,9 +250,9 @@ def main(argv):
      #    {'turbo': False, 'kernelconfig': 'baseline','ht':False},
       #    {'turbo': False, 'kernelconfig': 'baseline','ht':True},
       #    {'turbo': False, 'kernelconfig': 'disable_c1e_c6','ht':False},
-          {'turbo': False, 'kernelconfig': 'disable_c1e_c6','ht':True},
-      #   {'turbo': False, 'kernelconfig': 'disable_c6','ht':False},
-      #   {'turbo': False, 'kernelconfig': 'disable_c6','ht':True},
+       #   {'turbo': False, 'kernelconfig': 'disable_c1e_c6','ht':True},
+          {'turbo': False, 'kernelconfig': 'disable_c6','ht':False},
+          {'turbo': False, 'kernelconfig': 'disable_c6','ht':True},
         
 ##         {'turbo': False, 'kernelconfig': 'disable_c6'},
 #         {'turbo': True, 'kernelconfig': 'disable_c6'},
