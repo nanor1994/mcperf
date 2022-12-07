@@ -1,0 +1,12 @@
+echo "POLL"
+cat CPU[0-9].POLL.usage |grep , | cut -d',' -f2
+cat CPU1[0-9].POLL.usage |grep , | cut -d',' -f2
+echo "C1"
+cat CPU[0-9].C1.usage |grep , | cut -d',' -f2
+cat CPU1[0-9].C1.usage |grep , | cut -d',' -f2
+echo "C1e"
+cat CPU[0-9].C1E.usage |grep , | cut -d',' -f2
+cat CPU1[0-9].C1E.usage |grep , | cut -d',' -f2
+echo "c6"
+cat CPU[0-9].C6.usage |grep , | cut -d',' -f2
+cat CPU1[0-9].C6.usage |grep , | cut -d',' -f2
