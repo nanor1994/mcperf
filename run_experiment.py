@@ -223,7 +223,7 @@ def run_multiple_experiments(root_results_dir, batch_name, system_conf, batch_co
     #request_qps = [10000, 50000, 100000, 200000, 300000, 400000, 500000, 1000000, 2000000]
     #request_qps = [10000, 50000, 100000, 200000, 300000, 400000, 500000, 600000, 700000, 800000]
     #request_qps = [10000, 50000, 100000, 200000, 300000, 400000, 500000]
-    request_qps = [400000]
+    request_qps = [100000]
     root_results_dir = os.path.join(root_results_dir, batch_name)
     set_uncore_freq(system_conf, 2000)
     for qps in request_qps:
@@ -274,7 +274,7 @@ def main(argv):
         'memcached_worker_threads': 20,
         'memcached_memory_limit_mb': 16384,
         'memcached_pin_threads': 'true',
-        'mcperf_time': 6,
+        'mcperf_time': 24,
         'mcperf_warmup_qps': 1000000,
         'mcperf_warmup_time': 1,
         'mcperf_records': 1000000,
