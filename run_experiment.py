@@ -247,15 +247,15 @@ def main(argv):
 #         {'turbo': False, 'kernelconfig': 'disable_c6'},
 #         {'turbo': True, 'kernelconfig': 'baseline'},
      
-        {'turbo': False, 'kernelconfig': 'baseline','ht':True},
-        {'turbo': False, 'kernelconfig': 'disable_cstates','ht':True},
-         {'turbo': False, 'kernelconfig': 'disable_c1e_c6','ht':True},
-         {'turbo': False, 'kernelconfig': 'disable_c6','ht':True},
-    # {'turbo': False, 'kernelconfig': 'baseline','ht':False},
-           #    {'turbo': False, 'kernelconfig': 'disable_cstates','ht':False},
-        #  {'turbo': False, 'kernelconfig': 'disable_c1e_c6','ht':False},
+     #   {'turbo': False, 'kernelconfig': 'baseline','ht':True},
+      #  {'turbo': False, 'kernelconfig': 'disable_cstates','ht':True},
+      #   {'turbo': False, 'kernelconfig': 'disable_c1e_c6','ht':True},
+     #    {'turbo': False, 'kernelconfig': 'disable_c6','ht':True},
+     {'turbo': False, 'kernelconfig': 'baseline','ht':False},
+               {'turbo': False, 'kernelconfig': 'disable_cstates','ht':False},
+          {'turbo': False, 'kernelconfig': 'disable_c1e_c6','ht':False},
         
-      #    {'turbo': False, 'kernelconfig': 'disable_c6','ht':False},
+         {'turbo': False, 'kernelconfig': 'disable_c6','ht':False},
          
         
 ##         {'turbo': False, 'kernelconfig': 'disable_c6'},
@@ -272,7 +272,7 @@ def main(argv):
 ##         {'turbo': True, 'kernelconfig': 'disable_cstates'},
     ]
     batch_conf = common.Configuration({
-        'memcached_worker_threads': 20,
+        'memcached_worker_threads': 10,
         'memcached_memory_limit_mb': 16384,
         'memcached_pin_threads': 'true',
         'mcperf_time': 10,
