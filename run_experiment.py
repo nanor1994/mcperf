@@ -174,7 +174,7 @@ def run_single_experiment(root_results_dir, name_prefix, conf, idx):
     exec_command("sudo python3 ./profiler.py -n node1 -i {} start".format(idx))
    # stdout = exec_command("./memcache-perf/mcperf -s node1 --noload -B -T 40 -Q 1000 -D 4 -C 4 {} -c 4 -q {} -t {} -r {} --iadist={} --keysize={} --valuesize={}".format(agents_parameter(), conf.mcperf_qps, conf.mcperf_time, conf.mcperf_records, conf.mcperf_iadist, conf.mcperf_keysize, conf.mcperf_valuesize))
     stdout = exec_command(
-        "./memcache-perf/mcperf -s node1 --noload -B -T 1"
+        "./memcache-perf/mcperf -s node1 --noload -B -T 1 "
         "-c 1 -q {} -t {} -r {} "
         "--iadist={} --keysize={} --valuesize={}"
         .format( conf.mcperf_qps, conf.mcperf_time, conf.mcperf_records, conf.mcperf_iadist, conf.mcperf_keysize, conf.mcperf_valuesize))
