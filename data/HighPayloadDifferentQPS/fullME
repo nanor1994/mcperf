@@ -1,0 +1,11 @@
+echo "bas"
+./metric baseline $1 $2
+
+echo "diss"
+./metric disable_cstates $1 $2 
+
+echo "c1"
+./metric disable_c1e_c6 $1 $2
+
+echo "c1e"
+./metric disable_c6 $1 $2

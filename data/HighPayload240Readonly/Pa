@@ -1,0 +1,10 @@
+echo "package 0"
+cat turbo\=False-kernelconfig\=$1-SMT\=$3-qps\=$2-*/memcached/package-0 |grep ,| cut -d',' -f2 | grep -v ^0.0
+
+
+echo "package 1"
+cat turbo\=False-kernelconfig\=$1-SMT\=$3-qps\=$2-*/memcached/package-1 |grep ,| cut -d',' -f2 | grep -v ^0.0
+
+
+echo "dram"
+cat turbo\=False-kernelconfig\=$1-SMT\=$3-qps\=$2-*/memcached/dram |grep ,| cut -d',' -f2 | grep -v ^0.0

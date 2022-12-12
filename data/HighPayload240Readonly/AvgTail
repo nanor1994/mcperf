@@ -1,0 +1,16 @@
+echo "mcperf Avg"
+
+cat turbo\=False-kernelconfig\=$1-SMT\=$2-qps\=$3-*/mcperf* | grep read |tr -s " " |cut -d" " -f2
+ 
+echo "mcperf Tail"
+
+cat turbo\=False-kernelconfig\=$1-SMT\=$2-qps\=$3-*/mcperf* | grep read |tr -s " " |cut -d" " -f14
+
+echo "memcache Avg"
+
+cat turbo\=False-kernelconfig\=$1-SMT\=$2-qps\=$3-*/memcachedstat* | grep "Process Time" |cut -d" " -f5
+ 
+echo "memcache Tail"
+
+cat turbo\=False-kernelconfig\=$1-SMT\=$2-qps\=$3-*/memcachedstat*  | grep "Process Tail" |cut -d" " -f6
+

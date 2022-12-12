@@ -1,0 +1,26 @@
+echo "baseline/off"
+./AvgTail baseline False $1
+
+echo "dis/off"
+./AvgTail disable_cstates False $1
+
+
+echo "c1/off"
+./AvgTail disable_c1e_c6 False $1
+
+echo "c1e/off"
+./AvgTail disable_c6 False $1
+
+echo "baseline"
+./AvgTail baseline True $1
+
+echo "c1/on"
+./AvgTail disable_c1e_c6 True $1
+
+
+echo "c1e/on"
+./AvgTail disable_c6 True $1
+
+
+echo "c1e/on"
+./AvgTail disable_c6 True $1
