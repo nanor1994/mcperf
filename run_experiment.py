@@ -244,8 +244,8 @@ def main(argv):
 #         {'turbo': True, 'kernelconfig': 'baseline'},
      
      #   {'turbo': False, 'kernelconfig': 'baseline','ht':True},
-        {'turbo': False, 'kernelconfig': 'disable_cstates','ht':True},
-         {'turbo': False, 'kernelconfig': 'disable_c1e_c6','ht':True},
+     #   {'turbo': False, 'kernelconfig': 'disable_cstates','ht':True},
+      #   {'turbo': False, 'kernelconfig': 'disable_c1e_c6','ht':True},
          {'turbo': False, 'kernelconfig': 'disable_c6','ht':True},
        #   {'turbo': False, 'kernelconfig': 'baseline','ht':False},
        #   {'turbo': False, 'kernelconfig': 'disable_cstates','ht':False},
