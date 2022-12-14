@@ -172,7 +172,7 @@ def run_single_experiment(root_results_dir, name_prefix, conf, idx):
     
     # do the measured run
     exec_command("sudo python3 ./profiler.py -n node1 -i {} start".format(idx))
-    stdout = exec_command("./memcache-perf/mcperf -s node1 --noload -B -T 40 -Q 1000 -D 4 -C 4 {} -c 4 -q {} -t {} -r {} --iadist={} --keysize={} --valuesize={}".format(agents_parameter(), conf.mcperf_qps, conf.mcperf_time, conf.mcperf_records, conf.mcperf_iadist, conf.mcperf_keysize, conf.mcperf_valuesize))
+    stdout = exec_command("./memcache-perf/mcperf -s node1 --noload -B -T 40 -Q 1000 -D 4 -C 4 {} -c 4 -q {} -t {} -r {} -u 0.5 --iadist={} --keysize={} --valuesize={}".format(agents_parameter(), conf.mcperf_qps, conf.mcperf_time, conf.mcperf_records, conf.mcperf_iadist, conf.mcperf_keysize, conf.mcperf_valuesize))
   #  stdout = exec_command("./memcache-perf/mcperf -s node1 --noload -B -T 1 -c 1 -q {} -t {} -r {} --iadist={} --keysize={} --valuesize={}".format( conf.mcperf_qps, conf.mcperf_time, conf.mcperf_records, conf.mcperf_iadist, conf.mcperf_keysize, conf.mcperf_valuesize))
     exec_command("sudo python3 ./profiler.py -n node1 -i {} stop".format(idx))
     exec_command("sudo python3 ./profiler.py -n node1 report -d {}".format(memcached_results_dir_path))
@@ -220,7 +220,7 @@ def run_multiple_experiments(root_results_dir, batch_name, system_conf, batch_co
     #request_qps = [10000, 50000, 100000, 200000, 300000, 400000, 500000, 1000000, 2000000]
     #request_qps = [10000, 50000, 100000, 200000, 300000, 400000, 500000, 600000, 700000, 800000]
     #request_qps = [10000, 50000, 100000, 200000, 300000, 400000, 500000]
-    request_qps = [100000]
+    request_qps = [10000]
     root_results_dir = os.path.join(root_results_dir, batch_name)
     set_uncore_freq(system_conf, 2000)
     for qps in request_qps:
@@ -271,7 +271,7 @@ def main(argv):
         'memcached_worker_threads': 20,
         'memcached_memory_limit_mb': 16384,
         'memcached_pin_threads': 'true',
-        'mcperf_time': 24,
+        'mcperf_time': 240,
         'mcperf_warmup_qps': 1000000,
         'mcperf_warmup_time': 1,
         'mcperf_records': 1000000,
