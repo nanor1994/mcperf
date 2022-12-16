@@ -122,8 +122,10 @@ def configure_memcached_node(conf):
         os.system('ssh -n {} "cd ~/mcperf; sudo python3 configure.py -v --turbo={} --kernelconfig={} -v"'.format(node, conf['turbo'], conf['kernelconfig']))
         if conf['ht'] == False:
         	os.system('ssh -n {} "echo "forceoff" | sudo tee /sys/devices/system/cpu/smt/control"'.format(node))
+            os.system('ssh -n {} "echo "performance" | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor"'.format(node))
         if conf['ht'] == True:
-        	os.system('ssh -n {} "echo "on" | sudo tee /sys/devices/system/cpu/smt/control"'.format(node))        
+        	os.system('ssh -n {} "echo "on" | sudo tee /sys/devices/system/cpu/smt/control"'.format(node)) 
+            os.system('ssh -n {} "echo "performance" | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor"'.format(node))
         
 def agents_list():
     config = configparser.ConfigParser(allow_no_value=True)
