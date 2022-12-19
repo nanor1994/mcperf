@@ -1,0 +1,41 @@
+
+echo "iTlb-misses"
+cat turbo\=False-kernelconfig\=$1-SMT\=$3-qps\=$2-*/memcached/iTLB-load-misses |grep ,| cut -d',' -f2 | grep -v ^0.0
+ 
+
+echo "dTlb-misses"
+cat turbo\=False-kernelconfig\=$1-SMT\=$3-qps\=$2-*/memcached/dTLB-load-misses |grep ,| cut -d',' -f2 | grep -v ^0.0
+ 
+echo "BR_MISP_RETIRED.ALL_BRANCHES"
+cat turbo\=False-kernelconfig\=$1-SMT\=$3-qps\=$2-*/memcached/BR_MISP_RETIRED.ALL_BRANCHES |grep ,| cut -d',' -f2 | grep -v ^0.0
+
+echo "L1-icache-misses"
+cat turbo\=False-kernelconfig\=$1-SMT\=$3-qps\=$2-*/memcached/L1-icache-load-misses |grep ,| cut -d',' -f2 | grep -v ^0.0
+ 
+
+echo "L1-dcache-misses"
+cat turbo\=False-kernelconfig\=$1-SMT\=$3-qps\=$2-*/memcached/L1-dcache-load-misses |grep ,| cut -d',' -f2 | grep -v ^0.0
+ 
+
+echo "L2-misses"
+cat turbo\=False-kernelconfig\=$1-SMT\=$3-qps\=$2-*/memcached/mem_load_retired.l2_miss |grep ,| cut -d',' -f2 | grep -v ^0.0
+ 
+echo "L3-misses"
+cat turbo\=False-kernelconfig\=$1-SMT\=$3-qps\=$2-*/memcached/mem_load_retired.l3_miss |grep ,| cut -d',' -f2 | grep -v ^0.0
+ 
+echo "instructions:u"
+cat turbo\=False-kernelconfig\=$1-SMT\=$3-qps\=$2-*/memcached/instructions:u |grep ,| cut -d',' -f2 | grep -v ^0.0
+
+
+echo "instructions:k"
+cat turbo\=False-kernelconfig\=$1-SMT\=$3-qps\=$2-*/memcached/instructions:k |grep ,| cut -d',' -f2 | grep -v ^0.0
+
+
+echo "cycles:u"
+cat turbo\=False-kernelconfig\=$1-SMT\=$3-qps\=$2-*/memcached/cycles:u |grep ,| cut -d',' -f2 | grep -v ^0.0
+
+
+echo "cycles:k"
+cat turbo\=False-kernelconfig\=$1-SMT\=$3-qps\=$2-*/memcached/cycles:k |grep ,| cut -d',' -f2 | grep -v ^0.0
+
+

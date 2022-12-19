@@ -1,0 +1,15 @@
+echo "bas on"
+./sc baseline $1 True
+
+
+
+echo "c1 on"
+./sc disable_c1e_c6 $1 True
+
+
+echo "c1e on"
+./sc disable_c6 $1 True
+
+
+echo "disable on"
+./sc disable_cstates $1 True
